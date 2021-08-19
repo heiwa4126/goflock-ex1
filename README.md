@@ -46,3 +46,7 @@ Python同様、別ロックファイルにするべきだろう。
 効率よくないのでUINT64そのもの書く版も学習用に作ってみる。
 
 Rust版も作ってみるかなあ。
+
+UNIX以外もサポートする場合は
+[gofrs/flock: Thread\-safe file locking library in Go \(originally github\.com/theckman/go\-flock\)](https://github.com/gofrs/flock)
+を参照。
