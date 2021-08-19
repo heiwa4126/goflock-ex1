@@ -11,13 +11,13 @@ import (
 	"unsafe"
 )
 
-const count_file = "./var/count"
+const count_file = "/tmp/goflock-ex1-count"
 
 var (
-	// Version ...
-	Version string = "v9.9.9"
-	// Revision =$(git rev-parse --short HEAD)
-	Revision string = "9999999"
+	// Version = $(git tag --sort=-v:refname | grep '^v' | head -1 | sed 's/^v//')
+	Version string = "9.9.9"
+	// Revision = $(git rev-parse --short HEAD)
+	Revision string = "zzzzzzz"
 )
 
 func setFileLock(f *os.File, lock bool) error {
@@ -38,95 +38,56 @@ func initCounter() (cnt uint64, err error) {
 	return
 }
 
-func incCounter() (uint64, error) {
+func incCounter(lock bool) (uint64, error) {
 	f, err := os.OpenFile(count_file, os.O_RDWR, 0664)
 	if err != nil {
 		return 0, err
 	}
 	defer f.Close()
 
-	b, err := ioutil.ReadAll(f)
-	if err != nil {
-		return 0, err
-	}
-
-	cnt, err := strconv.ParseUint(*(*string)(unsafe.Pointer(&b)), 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	cnt++
-
-	err = f.Truncate(0)
-	if err != nil {
-		return 0, err
-	}
-	_, err = f.Seek(0, io.SeekStart)
-	if err != nil {
-		return 0, err
-	}
-
-	_, err = f.WriteString(strconv.FormatUint(cnt, 10))
-	if err != nil {
-		return 0, err
-	}
-
-	return cnt, nil
-}
-
-func flockIncCounter() (uint64, error) {
-	f, err := os.OpenFile(count_file, os.O_RDWR, 0664)
-	if err != nil {
-		return 0, err
-	}
-	defer f.Close()
-
-	err = setFileLock(f, true)
-	if err != nil {
-		return 0, err
-	}
-	defer setFileLock(f, false)
-
-	b, err := ioutil.ReadAll(f)
-	if err != nil {
-		return 0, err
-	}
-
-	cnt, err := strconv.ParseUint(*(*string)(unsafe.Pointer(&b)), 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	cnt++
-
-	err = f.Truncate(0)
-	if err != nil {
-		return 0, err
-	}
-	_, err = f.Seek(0, io.SeekStart)
-	if err != nil {
-		return 0, err
-	}
-
-	_, err = f.WriteString(strconv.FormatUint(cnt, 10))
-	if err != nil {
-		return 0, err
-	}
-
-	return cnt, nil
-}
-
-func incCounter10000() (cnt uint64, err error) {
-	for i := 0; i < 10000; i++ {
-		cnt, err = incCounter()
+	if lock {
+		err = setFileLock(f, true)
 		if err != nil {
-			break
+			return 0, err
 		}
+		defer func() {
+			if cerr := setFileLock(f, false); err == nil {
+				err = cerr
+			}
+		}()
 	}
-	return
+
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		return 0, err
+	}
+
+	cnt, err := strconv.ParseUint(*(*string)(unsafe.Pointer(&b)), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	cnt++
+
+	err = f.Truncate(0)
+	if err != nil {
+		return 0, err
+	}
+	_, err = f.Seek(0, io.SeekStart)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = f.WriteString(strconv.FormatUint(cnt, 10))
+	if err != nil {
+		return 0, err
+	}
+
+	return cnt, nil
 }
 
-func flockIncCounter10000() (cnt uint64, err error) {
+func incCounter10000(lock bool) (cnt uint64, err error) {
 	for i := 0; i < 10000; i++ {
-		cnt, err = flockIncCounter()
+		cnt, err = incCounter(lock)
 		if err != nil {
 			break
 		}
@@ -150,9 +111,9 @@ func main() {
 
 	switch os.Args[1] {
 	case "inc":
-		cnt, err = incCounter10000()
+		cnt, err = incCounter10000(false)
 	case "flockinc":
-		cnt, err = flockIncCounter10000()
+		cnt, err = incCounter10000(true)
 	case "init":
 		cnt, err = initCounter()
 	default:
