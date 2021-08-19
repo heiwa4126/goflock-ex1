@@ -38,17 +38,17 @@ func initCounter() (cnt uint64, err error) {
 	return
 }
 
-func incCounter(lock bool) (uint64, error) {
+func incCounter(lock bool) (cnt uint64, err error) {
 	f, err := os.OpenFile(count_file, os.O_RDWR, 0664)
 	if err != nil {
-		return 0, err
+		return
 	}
 	defer f.Close()
 
 	if lock {
 		err = setFileLock(f, true)
 		if err != nil {
-			return 0, err
+			return
 		}
 		defer func() {
 			if cerr := setFileLock(f, false); err == nil {
@@ -59,30 +59,27 @@ func incCounter(lock bool) (uint64, error) {
 
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
-		return 0, err
+		return
 	}
 
-	cnt, err := strconv.ParseUint(*(*string)(unsafe.Pointer(&b)), 10, 64)
+	cnt, err = strconv.ParseUint(*(*string)(unsafe.Pointer(&b)), 10, 64)
 	if err != nil {
-		return 0, err
+		return
 	}
 	cnt++
 
 	err = f.Truncate(0)
 	if err != nil {
-		return 0, err
+		return
 	}
 	_, err = f.Seek(0, io.SeekStart)
 	if err != nil {
-		return 0, err
+		return
 	}
 
 	_, err = f.WriteString(strconv.FormatUint(cnt, 10))
-	if err != nil {
-		return 0, err
-	}
 
-	return cnt, nil
+	return
 }
 
 func incCounter10000(lock bool) (cnt uint64, err error) {
