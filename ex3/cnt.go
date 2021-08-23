@@ -11,8 +11,16 @@ import (
 
 const count_file = "/tmp/goflock-ex1-count3"
 
-func InitCounter() (cnt uint64, err error) {
-	f, err := os.Create(count_file)
+type Counter3 struct {
+	countFile string
+}
+
+func New() *Counter3 {
+	return &Counter3{countFile: count_file}
+}
+
+func (counter *Counter3) InitCounter() (cnt uint64, err error) {
+	f, err := os.Create(counter.countFile)
 	if err != nil {
 		return
 	}
@@ -21,8 +29,8 @@ func InitCounter() (cnt uint64, err error) {
 	return
 }
 
-func incCounter(lock bool) (cnt uint64, err error) {
-	f, err := os.OpenFile(count_file, os.O_RDWR, 0664)
+func (counter *Counter3) incCounter(lock bool) (cnt uint64, err error) {
+	f, err := os.OpenFile(counter.countFile, os.O_RDWR, 0664)
 	if err != nil {
 		return
 	}
@@ -61,9 +69,9 @@ func incCounter(lock bool) (cnt uint64, err error) {
 	return
 }
 
-func IncCounter10000(lock bool) (cnt uint64, err error) {
+func (counter *Counter3) IncCounter10000(lock bool) (cnt uint64, err error) {
 	for i := 0; i < 10000; i++ {
-		cnt, err = incCounter(lock)
+		cnt, err = counter.incCounter(lock)
 		if err != nil {
 			break
 		}

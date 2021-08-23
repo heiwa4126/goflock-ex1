@@ -11,8 +11,17 @@ import (
 const count_file = "/tmp/goflock-ex1-count4"
 const lock_file = "/tmp/goflock-ex1-count4.lock"
 
-func InitCounter() (cnt uint64, err error) {
-	f, err := os.Create(count_file)
+type Counter4 struct {
+	countFile string
+	lockFile  string
+}
+
+func New() *Counter4 {
+	return &Counter4{countFile: count_file, lockFile: lock_file}
+}
+
+func (counter *Counter4) InitCounter() (cnt uint64, err error) {
+	f, err := os.Create(counter.countFile)
 	if err != nil {
 		return
 	}
@@ -21,15 +30,15 @@ func InitCounter() (cnt uint64, err error) {
 	return
 }
 
-func incCounter(lock bool) (cnt uint64, err error) {
-	f, err := os.OpenFile(count_file, os.O_RDWR, 0664)
+func (counter *Counter4) incCounter(lock bool) (cnt uint64, err error) {
+	f, err := os.OpenFile(counter.countFile, os.O_RDWR, 0664)
 	if err != nil {
 		return
 	}
 	defer f.Close()
 
 	if lock {
-		fileLock := flock.New(lock_file)
+		fileLock := flock.New(counter.lockFile)
 		err = fileLock.Lock()
 		if err != nil {
 			return
@@ -55,9 +64,9 @@ func incCounter(lock bool) (cnt uint64, err error) {
 	return
 }
 
-func IncCounter10000(lock bool) (cnt uint64, err error) {
+func (counter *Counter4) IncCounter10000(lock bool) (cnt uint64, err error) {
 	for i := 0; i < 10000; i++ {
-		cnt, err = incCounter(lock)
+		cnt, err = counter.incCounter(lock)
 		if err != nil {
 			break
 		}

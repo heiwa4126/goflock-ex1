@@ -9,7 +9,8 @@ import (
 
 	"github.com/heiwa4126/goflock-ex1/ex1"
 	"github.com/heiwa4126/goflock-ex1/ex2"
-	// "github.com/heiwa4126/goflock-ex1/ex3"
+	"github.com/heiwa4126/goflock-ex1/ex3"
+	"github.com/heiwa4126/goflock-ex1/ex4"
 	// "github.com/heiwa4126/goflock-ex1/ex4"
 )
 
@@ -19,8 +20,7 @@ const (
 	COUNTER_INIT CounterAction = iota
 	COUNTER_INC
 	COUNTER_LINC
-)
-const (
+	//
 	CMD_INIT = "init"
 	CMD_INC  = "inc"
 	CMD_LINC = "flockinc"
@@ -62,7 +62,7 @@ func cmdint(cmd string) (string, int64) {
 	return r[1], n
 }
 
-func parseCmdline(args []string) (Counter, CounterAction) {
+func parseSubcmd(args []string) (Counter, CounterAction) {
 	if len(args) < 2 {
 		help()
 	}
@@ -87,6 +87,10 @@ func parseCmdline(args []string) (Counter, CounterAction) {
 		counter = ex1.New()
 	case 2:
 		counter = ex2.New()
+	case 3:
+		counter = ex3.New()
+	case 4:
+		counter = ex4.New()
 	default:
 		help()
 	}
@@ -98,7 +102,7 @@ func main() {
 	var err error
 	var cnt uint64
 
-	counter, cAct := parseCmdline(os.Args)
+	counter, cAct := parseSubcmd(os.Args)
 
 	switch cAct {
 	case COUNTER_INIT:
