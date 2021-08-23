@@ -32,6 +32,13 @@ $INIT ; $INC & $INC & $INC
 $INIT ; $FINC & $FINC & $FINC
 ```
 
+# ex1,2 ...
+
+- ex1 - 素朴版。もとのPythonと同じ。ただしバッファリングなし。ファイルは数字文字列
+- ex2 - バッファリングなし。ファイルはUINT64をリトルエンディアンで
+- ex3 - 無理やりバッファI/Oにしてみた。ファイルはex2と同じ
+- ex4 - ex2を [gofrs/flock](https://github.com/gofrs/flock) にしてみたもの。ロックファイルがカウンタファイルと別
+
 
 # そのほかメモ
 
@@ -52,3 +59,9 @@ Rust版も作ってみるかなあ。
 UNIX以外もサポートする場合は
 [gofrs/flock: Thread\-safe file locking library in Go \(originally github\.com/theckman/go\-flock\)](https://github.com/gofrs/flock)
 を参照。
+
+終わったら
+```sh
+rm /tmp/goflock-ex1-count*
+```
+すること。

@@ -7,6 +7,8 @@ import (
 
 	"github.com/heiwa4126/goflock-ex1/ex1"
 	"github.com/heiwa4126/goflock-ex1/ex2"
+	"github.com/heiwa4126/goflock-ex1/ex3"
+	"github.com/heiwa4126/goflock-ex1/ex4"
 )
 
 var (
@@ -37,12 +39,28 @@ func main() {
 		cnt, err = ex1.IncCounter10000(true)
 	case "init":
 		cnt, err = ex1.InitCounter()
+		// ---
 	case "inc2":
 		cnt, err = ex2.IncCounter10000(false)
 	case "flockinc2":
 		cnt, err = ex2.IncCounter10000(true)
 	case "init2":
 		cnt, err = ex2.InitCounter()
+		// ---
+	case "inc3":
+		cnt, err = ex3.IncCounter10000(false)
+	case "flockinc3":
+		cnt, err = ex3.IncCounter10000(true)
+	case "init3":
+		cnt, err = ex3.InitCounter()
+		// ---
+	case "inc4":
+		cnt, err = ex4.IncCounter10000(false)
+	case "flockinc4":
+		cnt, err = ex4.IncCounter10000(true)
+	case "init4":
+		cnt, err = ex4.InitCounter()
+		// ---
 	default:
 		help()
 	}
