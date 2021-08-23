@@ -62,21 +62,15 @@ func cmdint(cmd string) (string, int64) {
 	return r[1], n
 }
 
-func parseCmdline(args []string) (*Counter, CounterAction) {
+func parseCmdline(args []string) (Counter, CounterAction) {
 	if len(args) < 2 {
 		help()
 	}
 
-	//var counter *Counter
-	counter := ex1.New()
+	var counter Counter
 	cAct := COUNTER_INIT
-	cmd, _ := cmdint(args[1])
-	// cmd, exnum := cmdint(args[1])
-	// switch exnum {
-	// case 1:
-	// default:
-	// 	help()
-	// }
+	cmd, exnum := cmdint(args[1])
+
 	switch cmd {
 	case CMD_INIT:
 		cAct = COUNTER_INIT
@@ -88,6 +82,13 @@ func parseCmdline(args []string) (*Counter, CounterAction) {
 		help()
 	}
 
+	switch exnum {
+	case 1:
+		counter = ex1.New()
+	default:
+		help()
+	}
+
 	return counter, cAct
 }
 
@@ -95,8 +96,7 @@ func main() {
 	var err error
 	var cnt uint64
 
-	counter := ex1.New()
-	//counter, cAct := parseCmdline(os.Args)
+	counter, cAct := parseCmdline(os.Args)
 	fmt.Printf("counter: %v\n", counter)
 
 	switch cAct {
