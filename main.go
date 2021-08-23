@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/heiwa4126/goflock-ex1/ex1"
-	// "github.com/heiwa4126/goflock-ex1/ex2"
+	"github.com/heiwa4126/goflock-ex1/ex2"
 	// "github.com/heiwa4126/goflock-ex1/ex3"
 	// "github.com/heiwa4126/goflock-ex1/ex4"
 )
@@ -85,6 +85,8 @@ func parseCmdline(args []string) (Counter, CounterAction) {
 	switch exnum {
 	case 1:
 		counter = ex1.New()
+	case 2:
+		counter = ex2.New()
 	default:
 		help()
 	}
@@ -97,7 +99,6 @@ func main() {
 	var cnt uint64
 
 	counter, cAct := parseCmdline(os.Args)
-	fmt.Printf("counter: %v\n", counter)
 
 	switch cAct {
 	case COUNTER_INIT:
