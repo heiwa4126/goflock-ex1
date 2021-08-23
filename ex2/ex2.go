@@ -1,16 +1,14 @@
-package ex1
+package ex2
 
 import (
+	"encoding/binary"
 	"io"
-	"io/ioutil"
 	"os"
-	"strconv"
-	"unsafe"
 
 	"github.com/heiwa4126/goflock-ex1/util"
 )
 
-const count_file = "/tmp/goflock-ex1-count1"
+const count_file = "/tmp/goflock-ex1-count2"
 
 func InitCounter() (cnt uint64, err error) {
 	f, err := os.Create(count_file)
@@ -18,7 +16,7 @@ func InitCounter() (cnt uint64, err error) {
 		return
 	}
 	defer f.Close()
-	_, err = f.WriteString("0")
+	err = binary.Write(f, binary.LittleEndian, cnt)
 	return
 }
 
@@ -40,29 +38,22 @@ func incCounter(lock bool) (cnt uint64, err error) {
 			}
 		}()
 	}
-
-	b, err := ioutil.ReadAll(f)
-	if err != nil {
-		return
-	}
-
-	cnt, err = strconv.ParseUint(*(*string)(unsafe.Pointer(&b)), 10, 64)
+	err = binary.Read(f, binary.LittleEndian, &cnt)
 	if err != nil {
 		return
 	}
 	cnt++
 
-	err = f.Truncate(0)
-	if err != nil {
-		return
-	}
+	// err = f.Truncate(0)
+	// if err != nil {
+	// 	return
+	// }
 	_, err = f.Seek(0, io.SeekStart)
 	if err != nil {
 		return
 	}
 
-	_, err = f.WriteString(strconv.FormatUint(cnt, 10))
-
+	err = binary.Write(f, binary.LittleEndian, cnt)
 	return
 }
 
