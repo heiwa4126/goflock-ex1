@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+tasks:
+  default:
+    desc: Default task
+    cmds:
+      - task: build
+
+  lint:
+    desc: Run linter on the Go code
+    cmds:
+      - golangci-lint run ./...
+
+  audit:
+    cmds:
+      - govulncheck -show verbose ./...
+
+  build:
+    desc: Build the Go application
+    cmds:
+      - go build
