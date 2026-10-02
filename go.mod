@@ -2,6 +2,6 @@ module github.com/heiwa4126/goflock-ex1
 
 go 1.25.9
 
-require github.com/gofrs/flock v0.13.0
+require github.com/gofrs/flock v0.13.1
 
-require golang.org/x/sys v0.43.0 // indirect
+require golang.org/x/sys v0.47.0 // indirect
